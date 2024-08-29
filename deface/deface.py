@@ -78,7 +78,7 @@ def draw_det(
 
 def anonymize_frame(
         dets, frame, mask_scale,
-        replacewith, ellipse, draw_scores, replaceimg, mosaicsize
+        replacewith, ellipse, draw_scores, replaceimg, mosaicsize, offset
 ):
     for i, det in enumerate(dets):
         boxes, score = det[:4], det[4]
@@ -88,7 +88,7 @@ def anonymize_frame(
         y1, y2 = max(0, y1), min(frame.shape[0] - 1, y2)
         x1, x2 = max(0, x1), min(frame.shape[1] - 1, x2)
         draw_det(
-            frame, score, i, x1, y1, x2, y2,
+            frame, score, i, x1+offset[0], y1+offset[1], x2+offset[0], y2+offset[1],
             replacewith=replacewith,
             ellipse=ellipse,
             draw_scores=draw_scores,
@@ -164,7 +164,7 @@ def video_detect(
         anonymize_frame(
             dets, frame, mask_scale=mask_scale,
             replacewith=replacewith, ellipse=ellipse, draw_scores=draw_scores,
-            replaceimg=replaceimg, mosaicsize=mosaicsize
+            replaceimg=replaceimg, mosaicsize=mosaicsize, offset=(0, 0)
         )
 
         if opath is not None:
@@ -195,6 +195,7 @@ def image_detect(
         keep_metadata: bool,
         replaceimg = None,
         mosaicsize: int = 20,
+        offset: Tuple[int, int] = (0, 0)
 ):
     frame = iio.imread(ipath)
 
@@ -205,11 +206,11 @@ def image_detect(
 
     # Perform network inference, get bb dets but discard landmark predictions
     dets, _ = centerface(frame, threshold=threshold)
-
+    print(offset)
     anonymize_frame(
         dets, frame, mask_scale=mask_scale,
         replacewith=replacewith, ellipse=ellipse, draw_scores=draw_scores,
-        replaceimg=replaceimg, mosaicsize=mosaicsize
+        replaceimg=replaceimg, mosaicsize=mosaicsize, offset=offset
     )
 
     if enable_preview:
@@ -320,6 +321,12 @@ def parse_cli_args():
     parser.add_argument(
         '--keep-metadata', '-m', default=False, action='store_true',
         help='Keep metadata of the original image. Default : False.')
+    parser.add_argument(
+        '--offset-x', '-x', default=0, type=int, metavar='X',
+    )
+    parser.add_argument(
+        '--offset-y', '-y', default=0, type=int, metavar='Y',
+    )
     parser.add_argument('--help', '-h', action='help', help='Show this help message and exit.')
 
     args = parser.parse_args()
@@ -365,6 +372,7 @@ def main():
     execution_provider = args.execution_provider
     mosaicsize = args.mosaicsize
     keep_metadata = args.keep_metadata
+    offset = (args.offset_x, args.offset_y)
     replaceimg = None
     if in_shape is not None:
         w, h = in_shape.split('x')
@@ -425,7 +433,8 @@ def main():
                 enable_preview=enable_preview,
                 keep_metadata=keep_metadata,
                 replaceimg=replaceimg,
-                mosaicsize=mosaicsize
+                mosaicsize=mosaicsize,
+                offset=offset
             )
         elif filetype is None:
             print(f'Can\'t determine file type of file {ipath}. Skipping...')
