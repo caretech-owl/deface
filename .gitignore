@@ -109,3 +109,11 @@ ENV/
 .vscode/
 
 deface/_version.py
+
+# image files
+*.jpeg
+*.jpg
+*.png
+
+# MacOS
+.DS_Store
