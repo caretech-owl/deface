@@ -118,3 +118,6 @@ deface/_version.py
 
 # MacOS
 .DS_Store
+
+# excludes
+!deface/data/icon.png

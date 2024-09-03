@@ -2,10 +2,15 @@
 
 
 a = Analysis(
-    ['deface/deface.py'],
+    ['deface/gui.py'],
     pathex=[],
     binaries=[],
-    datas=[("deface/data/centerface.onnx", "deface/data"), ("deface/data/defaced.svg", "deface/data"), ("deface/data/delete.svg", "deface/data")],
+    datas=[
+        ("deface/data/centerface.onnx", "deface/data"),
+        ("deface/data/defaced.svg", "data"),
+        ("deface/data/delete.svg", "data"),
+        ("deface/data/gui.ui.qml", "data")
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -26,7 +31,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -41,4 +46,10 @@ coll = COLLECT(
     upx=True,
     upx_exclude=[],
     name='deface',
+)
+app = BUNDLE(
+    coll,
+    name='de.hsbi.care-tech.deface.app',
+    icon='deface/data/icon.icns',
+    bundle_identifier=None,
 )

@@ -63,6 +63,8 @@ Window {
                     ComboBox {
                         id: replaceWithBox
 
+                        ToolTip.text: "When a face is detected, it will be replaced with the selected pattern."
+                        ToolTip.visible: hovered
                         model: ["blur", "solid", "none", "image", "mosaic"]
                         width: 200
                     }
@@ -82,6 +84,8 @@ Window {
                             return decimal * decimalFactor;
                         }
 
+                        ToolTip.text: "Lower values will detect more faces, higher values will detect fewer faces."
+                        ToolTip.visible: hovered
                         editable: true
                         from: decimalToInt(0)
                         stepSize: 5
@@ -117,6 +121,8 @@ Window {
                             return decimal * decimalFactor;
                         }
 
+                        ToolTip.text: "The size of the mask used to replace the face. Should be larger than 1 to cover the whole face."
+                        ToolTip.visible: hovered
                         editable: true
                         from: decimalToInt(0.7)
                         stepSize: 1
@@ -144,7 +150,10 @@ Window {
                     SpinBox {
                         id: mosaicSizeBox
 
+                        ToolTip.text: "The size of the mosaic pattern in pixel. Only used when 'mosaic' is selected."
+                        ToolTip.visible: hovered
                         editable: true
+                        enabled: replaceWithBox.currentText === "mosaic"
                         from: 1
                         stepSize: 1
                         to: 1000
@@ -164,6 +173,8 @@ Window {
                     SpinBox {
                         id: offsetXBox
 
+                        ToolTip.text: "The horizontal offset of the mask. Positive values will move the mask to the right, negative values to the left."
+                        ToolTip.visible: hovered
                         editable: true
                         from: -1000
                         stepSize: 1
@@ -178,6 +189,8 @@ Window {
                     SpinBox {
                         id: offsetYBox
 
+                        ToolTip.text: "The vertical offset of the mask. Positive values will move the mask down, negative values up."
+                        ToolTip.visible: hovered
                         editable: true
                         from: -1000
                         stepSize: 1
@@ -192,6 +205,8 @@ Window {
                     ComboBox {
                         id: audioBox
 
+                        ToolTip.text: "For videos, you can choose to just copy the audio track unedited, distort it or remove it."
+                        ToolTip.visible: hovered
                         model: ["drop", "copy", "distort"]
                         width: 200
                     }
@@ -205,6 +220,8 @@ Window {
                     Switch {
                         id: skipExistingSwitch
 
+                        ToolTip.text: "If enabled, existing files will not be overwritten."
+                        ToolTip.visible: hovered
                         position: 0
                     }
                 }
@@ -255,7 +272,7 @@ Window {
 
                                     Button {
                                         enabled: totalProgressBar.value == 1.0
-                                        icon.source: "deface/data/delete.svg"
+                                        icon.source: appRoot + "/data/delete.svg"
 
                                         background: Rectangle {
                                             border.width: 1
@@ -296,7 +313,7 @@ Window {
                                     }
                                     Button {
                                         enabled: progress == 1.0
-                                        icon.source: "deface/data/defaced.svg"
+                                        icon.source: appRoot + "/data/defaced.svg"
 
                                         background: Rectangle {
                                             border.width: 1
@@ -327,7 +344,7 @@ Window {
 
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: 200
-                enabled: totalProgressBar.value == 1.0
+                enabled: totalProgressBar.value == 1.0 && fileList.count > 0
                 text: "Deface!"
 
                 onClicked: {

@@ -91,13 +91,14 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
     backend = Backend()
+    app_root_path = Path(__file__).parent
     engine.rootContext().setContextProperty("backend", backend)
-    with open(f"{os.path.dirname(__file__)}/gui.ui.qml", "rt", encoding="utf-8") as f:
-        engine.loadData(f.read().encode("utf-8"))
+    engine.rootContext().setContextProperty("appRoot", app_root_path.as_uri())
+    qml_file = app_root_path / 'data/gui.ui.qml'
+    engine.load(qml_file.as_uri())
     if not engine.rootObjects():
         sys.exit(-1)
     exit_code = app.exec()
-    print("Exiting...")
     backend.stop()
     del engine
     sys.exit(exit_code)
