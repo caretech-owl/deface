@@ -9,7 +9,8 @@ from PySide6.QtCore import QObject, Signal, Slot
 
 import numpy as np
 from deface.cli import main
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
+from urllib.request import url2pathname
 
 
 class Backend(QObject):
@@ -58,10 +59,9 @@ class Backend(QObject):
         skip_existing: float,
         audio: str = str,
     ):
-        url = urlparse(file)
-        assert url.scheme == "file"
-        in_path = Path(url.path)
-        out_path = Path(in_path.as_posix().replace(in_path.suffix, "_anonymized" + in_path.suffix))
+        file_path = url2pathname(unquote(urlparse(file).path))
+        in_path = Path(file_path).resolve()
+        out_path = Path(file_path.replace(in_path.suffix, "_anonymized" + in_path.suffix)).resolve()
         cmd = [
             "--replacewith",
             str(replace_with),
@@ -78,8 +78,8 @@ class Backend(QObject):
             "--audio",
             str(audio),
             "--output",
-            out_path.as_posix(),
-            in_path.as_posix(),
+            str(out_path),
+            str(in_path),
         ]
         self.queue.append((cmd, in_path, out_path, skip_existing))
         return out_path.as_uri()
