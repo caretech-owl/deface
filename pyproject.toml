@@ -37,7 +37,7 @@ deface = "deface.deface:main"
 packages = ["deface"]
 
 [tool.setuptools.package-data]
-deface = ["centerface.onnx"]
+data = ["*.onnx", "*.svg"]
 
 [tool.setuptools_scm]
 write_to = "deface/_version.py"

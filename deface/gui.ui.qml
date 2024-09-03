@@ -18,7 +18,6 @@ Window {
     }
     Connections {
         function onStatusUpdated(taskId, currentProgress, outPath) {
-            fileList.get(taskId).done = currentProgress == 1;
             fileList.get(taskId).progress = currentProgress;
             totalProgressBar.value = taskId + (currentProgress == 1 ? 1 : 0) / fileList.count;
         }
@@ -33,8 +32,8 @@ Window {
                 fileList.append({
                     name: basename(drop.urls[i].toString()),
                     url: drop.urls[i].toString(),
-                    done: false,
-                    resultUrl: ""
+                    resultUrl: "",
+                    progress: 0
                 });
             }
         }
@@ -231,7 +230,7 @@ Window {
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: "You can either click the file name to open the file or click the cross to remove the file from the list. The icon on the right will open the anonymized file after it has been created."
+                        text: "You can either click the file name to open the file or click the cross to remove the file from the list. Results will be written to the sources directory with a '_anonymized' suffix. The icon on the right will open the anonymized file."
                         width: parent.width
                         wrapMode: Text.WordWrap
                     }
@@ -256,7 +255,7 @@ Window {
 
                                     Button {
                                         enabled: totalProgressBar.value == 1.0
-                                        icon.source: "./data/delete.svg"
+                                        icon.source: "deface/data/delete.svg"
 
                                         background: Rectangle {
                                             border.width: 1
@@ -296,8 +295,8 @@ Window {
                                         }
                                     }
                                     Button {
-                                        enabled: done > 0
-                                        icon.source: "./data/defaced.svg"
+                                        enabled: progress == 1.0
+                                        icon.source: "deface/data/defaced.svg"
 
                                         background: Rectangle {
                                             border.width: 1
