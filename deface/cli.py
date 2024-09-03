@@ -132,7 +132,7 @@ def video_detect(
     draw_scores: bool,
     ffmpeg_config: Dict[str, str],
     replaceimg=None,
-    keep_audio: bool = False,
+    audio: str = "drop",
     mosaicsize: int = 20,
 ):
     try:
@@ -166,10 +166,12 @@ def video_detect(
         #  If fps is not explicitly set in ffmpeg_config, use source video fps value
         _ffmpeg_config.setdefault("fps", meta["fps"])
         # Carry over audio from input path, use "copy" codec (no transcoding) by default
-        if keep_audio and meta.get("audio_codec"):
+        if audio in ["copy", "distort"] and meta.get("audio_codec"):
             _ffmpeg_config.setdefault("audio_path", ipath)
-            # _ffmpeg_config.setdefault("audio_codec", "copy")
-            _ffmpeg_config.setdefault("output_params", ["-af","asetrate=44100*3/4,atempo=4/3"])
+            if audio == "copy":
+                _ffmpeg_config.setdefault("audio_codec", "copy")
+            else:
+                _ffmpeg_config.setdefault("output_params", ["-af","asetrate=44100*3/4,atempo=4/3"])
         writer: imageio.plugins.ffmpeg.FfmpegFormat.Writer = imageio.get_writer(
             opath, format="FFMPEG", mode="I", **_ffmpeg_config
         )
@@ -354,11 +356,10 @@ def parse_cli_args(argv: Sequence[str] | None = None):
         help="Setting the mosaic size. Requires --replacewith mosaic option. Default: 20.",
     )
     parser.add_argument(
-        "--keep-audio",
-        "-k",
-        default=False,
-        action="store_true",
-        help="Keep audio from video source file and copy it over to the output (only applies to videos).",
+        "--audio",
+        "-a",
+        default="drop",
+        help="Drop source's audio, copy or distort it.",
     )
     parser.add_argument(
         "--ffmpeg-config",
@@ -438,7 +439,7 @@ def main(argv: Sequence[str] | None = None, observer: Callable | None = None):
     threshold = args.thresh
     ellipse = not args.boxes
     mask_scale = args.mask_scale
-    keep_audio = args.keep_audio
+    audio = args.audio
     ffmpeg_config = args.ffmpeg_config
     backend = args.backend
     in_shape = args.scale
@@ -492,7 +493,7 @@ def main(argv: Sequence[str] | None = None, observer: Callable | None = None):
                 draw_scores=draw_scores,
                 observer=observer,
                 nested=multi_file,
-                keep_audio=keep_audio,
+                audio=audio,
                 ffmpeg_config=ffmpeg_config,
                 replaceimg=replaceimg,
                 mosaicsize=mosaicsize,

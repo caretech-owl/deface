@@ -15,25 +15,12 @@ Window {
     ListModel {
         id: fileList
 
-        ListElement {
-            done: false
-            name: "test.mov"
-            resultUrl: ""
-            url: "file:///Users/aneumann9/workspace/deface/test.mov"
-        }
-        ListElement {
-            done: false
-            name: "MarénSchorch.jpeg"
-            resultUrl: ""
-            url: "file:///Users/aneumann9/workspace/deface/IMG_7031_MarénSchorch.jpeg"
-        }
     }
     Connections {
-        function onStatusUpdated(taskId, currentProgress, frame, outPath) {
+        function onStatusUpdated(taskId, currentProgress, outPath) {
             fileList.get(taskId).done = currentProgress == 1;
-            currentProgressBar.value = currentProgress;
+            fileList.get(taskId).progress = currentProgress;
             totalProgressBar.value = taskId + (currentProgress == 1 ? 1 : 0) / fileList.count;
-            preview_image.source = frame;
         }
 
         target: backend
@@ -65,15 +52,9 @@ Window {
                 font.weight: 800
                 text: "Deface"
             }
-            Text {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.bottomMargin: 10
-                font.pointSize: 20
-                text: "Drag your images and videos into this app to process them."
-            }
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.margins: 10
+                Layout.margins: 5
                 spacing: 10
 
                 ColumnLayout {
@@ -174,7 +155,7 @@ Window {
             }
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.margins: 10
+                Layout.margins: 5
                 spacing: 10
 
                 ColumnLayout {
@@ -212,7 +193,7 @@ Window {
                     ComboBox {
                         id: audioBox
 
-                        model: ["none", "distort", "keep"]
+                        model: ["drop", "copy", "distort"]
                         width: 200
                     }
                 }
@@ -231,132 +212,112 @@ Window {
             }
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.margins: 10
-                spacing: 10
 
-                Rectangle {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.margins: 10
-                    Layout.maximumWidth: parent.width * 0.5
-                    border.color: "black"
-                    border.width: 5
-                    height: 100
-                    radius: 5
+                // Layout.margins: 10
+                // spacing: 10
 
-                    Text {
-                        id: preview_label
-
-                        anchors.centerIn: parent
-                        text: "Image Preview"
-                    }
-                    Image {
-                        id: preview_image
-
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.verticalCenter: parent.verticalCenter
-                        fillMode: Image.PreserveAspectFit
-                        height: parent.height - 10
-                        source: ""
-                        width: parent.width - 10
-                    }
-                }
                 ColumnLayout {
                     Layout.alignment: Qt.AlignTop
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     Layout.margins: 10
-                    Layout.maximumWidth: parent.width * 0.5
+
+                    // Layout.maximumWidth: parent.width * 0.5
 
                     Text {
-                        text: "File List (click on name to open; click on x to remove)"
+                        font.pointSize: 20
+                        font.weight: 400
+                        text: "File List"
                     }
-                    ListView {
-                        id: listView
-
+                    Text {
                         Layout.fillWidth: true
-                        // Layout.maximumWidth: parent.width * 0.5
-                        height: 200
-                        model: fileList
+                        text: "You can either click the file name to open the file or click the cross to remove the file from the list. The icon on the right will open the anonymized file after it has been created."
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                    }
+                    ScrollView {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        clip: true
 
-                        delegate: Item {
-                            height: 40
-                            width: listView.width
+                        ListView {
+                            id: listView
 
-                            RowLayout {
-                                Layout.alignment: Qt.AlignLeft
-                                width: parent.width
+                            model: fileList
 
-                                Button {
+                            delegate: Item {
+                                height: 45
+                                width: listView.width - 20
 
-                                    background: Rectangle {
-                                        border.width: 1
-                                        radius: 4
+                                RowLayout {
+                                    Layout.alignment: Qt.AlignLeft
+                                    width: parent.width
+
+                                    Button {
+                                        enabled: totalProgressBar.value == 1.0
+                                        icon.source: "./data/delete.svg"
+
+                                        background: Rectangle {
+                                            border.width: 1
+                                            radius: 4
+                                        }
+
+                                        onClicked: {
+                                            fileList.remove(index);
+                                        }
                                     }
+                                    Button {
+                                        Layout.fillHeight: true
+                                        Layout.fillWidth: true
 
-                                    onClicked: {
-                                        fileList.remove(index);
+                                        background: Rectangle {
+                                            border.width: 1
+                                            radius: 4
+
+                                            Rectangle {
+                                                anchors.left: parent.left
+                                                anchors.leftMargin: 1
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                color: "lightgreen"
+                                                height: parent.height - 2
+                                                radius: 4
+                                                width: progress * parent.width - 2
+                                            }
+                                        }
+                                        contentItem: Text {
+                                            horizontalAlignment: Text.AlignLeft
+                                            text: name
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+
+                                        onClicked: {
+                                            Qt.openUrlExternally(url);
+                                        }
                                     }
-                                }
-                                // Button {
-                                //     Layout.fillWidth: true
-                                //     Layout.rightMargin: 5
+                                    Button {
+                                        enabled: done > 0
+                                        icon.source: "./data/defaced.svg"
 
-                                //     background: Rectangle {
-                                //         border.width: 1
-                                //         color: done ? "lightgreen" : "white"
-                                //         radius: 4
-                                //     }
-                                //     contentItem: Text {
-                                //         horizontalAlignment: Text.AlignLeft
-                                //         text: name.length > 20 ? name.substring(0, 20) + "..." : name
-                                //     }
+                                        background: Rectangle {
+                                            border.width: 1
+                                            radius: 4
+                                        }
 
-                                //     onClicked: {
-                                //         if (fileList.get(index).done == true) {
-                                //             Qt.openUrlExternally(fileList.get(index).resultUrl);
-                                //         } else {
-                                //             Qt.openUrlExternally(fileList.get(index).url);
-                                //         }
-                                //     }
-                                // }
-                                // Button {
-                                //     Layout.preferredWidth: 50
-                                //     text: "❌"
-
-                                //     background: Rectangle {
-                                //         border.width: 1
-                                //         radius: 4
-                                //     }
-
-                                //     onClicked: {
-                                //         fileList.remove(index);
-                                //     }
-                                // }
-                                Button {
-                                    icon.source: "./data/person.svg"
-
-                                    background: Rectangle {
-                                        border.width: 1
-                                        radius: 4
-                                    }
-
-                                    onClicked: {
-                                        // fileList.remove(index);
-                                    }
-                                }
-                                Button {
-                                    icon.source: "./data/defaced.svg"
-
-                                    background: Rectangle {
-                                        border.width: 1
-                                        radius: 4
-                                    }
-
-                                    onClicked: {
-                                        // fileList.remove(index);
+                                        onClicked: {
+                                            Qt.openUrlExternally(resultUrl);
+                                        }
                                     }
                                 }
+                            }
+
+                            Label {
+                                anchors.fill: parent
+                                font.bold: true
+                                horizontalAlignment: Qt.AlignHCenter
+                                text: "Drag your images and videos here to process them."
+                                verticalAlignment: Qt.AlignVCenter
+                                visible: parent.count == 0
                             }
                         }
                     }
@@ -367,33 +328,17 @@ Window {
 
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: 200
+                enabled: totalProgressBar.value == 1.0
                 text: "Deface!"
 
                 onClicked: {
-                    defaceButton.enabled = false;
                     totalProgressBar.value = 0;
                     for (var i = 0; i < fileList.count; i++) {
-                        let resultUrl = backend.submit(fileList.get(i).url, replaceWithBox.currentText, threshBox.realValue, maskScaleBox.realValue, offsetXBox.value, offsetYBox.value, mosaicSizeBox.value, skipExistingSwitch.position);
-                        // preview_image.source = "";
-                        // if (resultUrl.endsWith("jpeg") || resultUrl.endsWith("png") || resultUrl.endsWith("jpg")) {
-                        //     preview_image.source = resultUrl;
-                        // } else {
-                        //     preview_label.text = "No preview available";
-                        // }
+                        let resultUrl = backend.submit(fileList.get(i).url, replaceWithBox.currentText, threshBox.realValue, maskScaleBox.realValue, offsetXBox.value, offsetYBox.value, mosaicSizeBox.value, skipExistingSwitch.position, audioBox.currentText);
                         fileList.get(i).resultUrl = resultUrl;
-                        // processProgress.value = (i + 1) / fileList.count;
                     }
                     backend.start();
-                    // defaceButton.enabled = true;
                 }
-            }
-            ProgressBar {
-                id: currentProgressBar
-
-                Layout.alignment: Qt.AlignHCenter
-                Layout.fillWidth: true
-                Layout.margins: 10
-                value: 0
             }
             ProgressBar {
                 id: totalProgressBar
