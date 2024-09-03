@@ -114,6 +114,7 @@ deface/_version.py
 *.jpeg
 *.jpg
 *.png
+*.mov
 
 # MacOS
 .DS_Store
