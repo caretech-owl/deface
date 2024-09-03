@@ -2,7 +2,6 @@ from collections import deque
 from functools import partial
 from pathlib import Path
 import sys
-import os
 from threading import Thread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine

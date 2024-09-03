@@ -50,6 +50,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='de.hsbi.care-tech.deface.app',
-    icon='deface/data/icon.icns',
+    icon='img/icon.icns',
     bundle_identifier=None,
 )

@@ -293,7 +293,7 @@ def get_anonymized_image(
 
 
 def parse_cli_args(argv: Sequence[str] | None = None):
-    parser = argparse.ArgumentParser(description="Video anonymization by face detection", add_help=False)
+    parser = argparse.ArgumentParser(description="Image and video anonymization by face detection and audio distortion", add_help=False)
     parser.add_argument(
         "input",
         nargs="*",
@@ -359,6 +359,7 @@ def parse_cli_args(argv: Sequence[str] | None = None):
         "--audio",
         "-a",
         default="drop",
+        choices=["drop", "copy", "distort"],
         help="Drop source's audio, copy or distort it.",
     )
     parser.add_argument(

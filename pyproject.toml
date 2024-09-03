@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "deface"
 requires-python = ">=3.8"
-description = "Video anonymization by face detection"
+description = "Image and video anonymization by face detection and audio distortion"
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = [
@@ -23,6 +23,7 @@ dependencies = [
     "tqdm",
     "scikit-image",
     "opencv-python",
+    "pyside6"
 ]
 
 [project.optional-dependencies]
@@ -46,4 +47,4 @@ write_to = "deface/_version.py"
 line-length = 120
 
 [project.urls]
-repository = "https://github.com/ORB-HD/deface"
+repository = "https://github.com/caretech-owl/deface"
