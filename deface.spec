@@ -37,6 +37,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='img/icon.ico',
 )
 coll = COLLECT(
     exe,
@@ -49,7 +50,7 @@ coll = COLLECT(
 )
 app = BUNDLE(
     coll,
-    name='de.hsbi.care-tech.deface.app',
+    name='deface.app',
     icon='img/icon.icns',
-    bundle_identifier=None,
+    bundle_identifier='de.hsbi.care-tech.deface',
 )
