@@ -14,7 +14,7 @@ from urllib.request import url2pathname
 
 
 class Backend(QObject):
-    statusUpdated = Signal(int, float, str, arguments=["taskId", "currentProgress", "outPath"])
+    statusUpdated = Signal(int, float, arguments=["taskId", "currentProgress"])
 
     def __init__(self):
         super().__init__()
@@ -23,19 +23,19 @@ class Backend(QObject):
         self._running = True
 
     def _observer(self, task_id: int, progress: float, frame: np.array, out_path: str):
-        self.statusUpdated.emit(task_id, progress, "file://" + out_path)
+        self.statusUpdated.emit(task_id, progress)
         return self._running
 
     def _run(self):
         task_id = 0
         while self.queue and self._running:
             cmd, in_path, out_path, skip_existing = self.queue.popleft()
-            self.statusUpdated.emit(task_id, 0, out_path.as_uri())
+            self.statusUpdated.emit(task_id, 0)
             if skip_existing and out_path.exists():
-                self.statusUpdated.emit(task_id, 1, out_path.as_uri())
+                self.statusUpdated.emit(task_id, 1)
             else:
                 main(cmd, partial(self._observer, task_id))
-                self.statusUpdated.emit(task_id, 1, out_path.as_uri())
+                self.statusUpdated.emit(task_id, 1)
 
             task_id += 1
 

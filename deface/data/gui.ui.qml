@@ -17,7 +17,7 @@ Window {
 
     }
     Connections {
-        function onStatusUpdated(taskId, currentProgress, outPath) {
+        function onStatusUpdated(taskId, currentProgress) {
             fileList.get(taskId).progress = currentProgress;
             totalProgressBar.value = taskId + (currentProgress == 1 ? 1 : 0) / fileList.count;
         }
