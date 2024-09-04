@@ -85,7 +85,7 @@ Window {
 
                         ToolTip.text: "When a face is detected, it will be replaced with the selected pattern."
                         ToolTip.visible: hovered
-                        model: ["blur", "solid", "none", "mosaic"]
+                        model: ["blur", "mosaic", "solid", "none"]
                         width: 200
                     }
                 }
