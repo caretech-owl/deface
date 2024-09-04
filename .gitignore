@@ -121,8 +121,8 @@ deface/_version.py
 
 # ffmpeg binaries
 deface/binaries/*
+!deface/binaries/.gitkeep
 
 # excludes
 !img/icon.png
 !img/deface_gui.png
-
