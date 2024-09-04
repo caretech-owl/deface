@@ -5,6 +5,7 @@ from functools import partial
 import json
 import mimetypes
 import os
+from pathlib import Path
 from typing import Callable, Dict, Sequence, Tuple
 
 import tqdm
@@ -13,6 +14,7 @@ import numpy as np
 import imageio
 import imageio.v2 as iio
 import imageio.plugins.ffmpeg
+from imageio_ffmpeg import get_ffmpeg_exe
 import cv2
 
 from deface.version import __version__
@@ -135,20 +137,24 @@ def video_detect(
     audio: str = "drop",
     mosaicsize: int = 20,
 ):
+    # check whether ffmpeg is installed
     try:
-        if "fps" in ffmpeg_config:
-            reader: imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config["fps"])
+        get_ffmpeg_exe()
+    except RuntimeError:
+        # If ffmpeg is not installed, use the included binary
+        ffmpeg_exe = Path(__file__).parent / 'binaries/ffmpeg'
+        if ffmpeg_exe.exists():
+            os.environ["IMAGEIO_FFMPEG_EXE"] = str(ffmpeg_exe)
         else:
-            reader: imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
+            raise
+    if "fps" in ffmpeg_config:
+        reader: imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config["fps"])
+    else:
+        reader: imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
 
-        meta = reader.get_meta_data()
-        _ = meta["size"]
-    except:
-        if cam:
-            print(f"Could not find video device {ipath}. Please set a valid input.")
-        else:
-            print(f"Could not open file {ipath} as a video file with imageio. Skipping file...")
-        return
+    meta = reader.get_meta_data()
+    _ = meta["size"]
+
 
     if cam:
         nframes = None
@@ -524,4 +530,9 @@ def main(argv: Sequence[str] | None = None, observer: Callable | None = None):
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(str(e))
+        exit(1)
+

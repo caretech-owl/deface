@@ -119,6 +119,10 @@ deface/_version.py
 # MacOS
 .DS_Store
 
+# ffmpeg binaries
+deface/binaries/*
+
 # excludes
 !img/icon.png
 !img/deface_gui.png
+
