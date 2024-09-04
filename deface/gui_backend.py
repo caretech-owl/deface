@@ -12,6 +12,7 @@ from urllib.request import url2pathname
 
 class Backend(QObject):
     statusUpdated = Signal(int, float, arguments=["taskId", "currentProgress"])
+    error = Signal(str, arguments=["message"])
 
     def __init__(self):
         super().__init__()
@@ -25,17 +26,19 @@ class Backend(QObject):
 
     def _run(self):
         task_id = 0
-        while self.queue and self._running:
-            cmd, in_path, out_path, skip_existing = self.queue.popleft()
-            self.statusUpdated.emit(task_id, 0)
-            if skip_existing and out_path.exists():
-                self.statusUpdated.emit(task_id, 1)
-            else:
-                main(cmd, partial(self._observer, task_id))
-                self.statusUpdated.emit(task_id, 1)
+        try:
+            while self.queue and self._running:
+                cmd, in_path, out_path, skip_existing = self.queue.popleft()
+                self.statusUpdated.emit(task_id, 0)
+                if skip_existing and out_path.exists():
+                    self.statusUpdated.emit(task_id, 1)
+                else:
+                    main(cmd, partial(self._observer, task_id))
+                    self.statusUpdated.emit(task_id, 1)
 
-            task_id += 1
-
+                task_id += 1
+        except Exception as e:
+            self.error.emit(str(e))
     def stop(self):
         self._running = False
 

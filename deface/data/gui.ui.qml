@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Window {
+    id: mainWindow
+
     function basename(str) {
         return (str.slice(str.lastIndexOf("/") + 1));
     }
@@ -17,6 +19,10 @@ Window {
 
     }
     Connections {
+        function onError(error) {
+            errorText.text = error;
+            errorText.visible = true;
+        }
         function onStatusUpdated(taskId, currentProgress) {
             fileList.get(taskId).progress = currentProgress;
             totalProgressBar.value = taskId + (currentProgress == 1 ? 1 : 0) / fileList.count;
@@ -50,6 +56,20 @@ Window {
                 font.pointSize: 20
                 font.weight: 800
                 text: "Deface"
+            }
+            Text {
+                id: errorText
+
+                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
+                Layout.margins: 10
+                color: "red"
+                font.pointSize: 16
+                font.weight: 600
+                text: ""
+                visible: true
+                width: parent.width
+                wrapMode: Text.WordWrap
             }
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
