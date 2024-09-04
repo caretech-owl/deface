@@ -10,7 +10,7 @@ a = Analysis(
         ("deface/data/defaced.svg", "data"),
         ("deface/data/delete.svg", "data"),
         ("deface/data/gui.ui.qml", "data"),
-        ("deface/binaries/ffmpeg", "deface/binaries"),
+        ("deface/binaries/*", "deface/binaries"),
     ],
     hiddenimports=[],
     hookspath=[],
