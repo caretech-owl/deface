@@ -8,7 +8,6 @@ import os
 from pathlib import Path
 from typing import Callable, Dict, Sequence, Tuple
 
-import tqdm
 import skimage.draw
 import numpy as np
 import imageio
@@ -127,7 +126,6 @@ def video_detect(
     threshold: float,
     observer: Callable,
     cam: bool,
-    nested: bool,
     replacewith: str,
     mask_scale: float,
     ellipse: bool,
@@ -162,10 +160,6 @@ def video_detect(
     else:
         read_iter = reader.iter_data()
         nframes = reader.count_frames()
-    if nested:
-        bar = tqdm.tqdm(dynamic_ncols=True, total=nframes, position=1, leave=True)
-    else:
-        bar = tqdm.tqdm(dynamic_ncols=True, total=nframes)
 
     if opath is not None:
         _ffmpeg_config = ffmpeg_config.copy()
@@ -205,11 +199,9 @@ def video_detect(
         if observer and cframes % 10 == 1:
             if not observer(0 if nframes is None else cframes/nframes, frame, opath):
                 break
-        bar.update()
     reader.close()
     if opath is not None:
         writer.close()
-    bar.close()
 
 
 def image_detect(
@@ -465,9 +457,6 @@ def main(argv: Sequence[str] | None = None, observer: Callable | None = None):
     # TODO: scalar downscaling setting (-> in_shape), preserving aspect ratio
     centerface = CenterFace(in_shape=in_shape, backend=backend, override_execution_provider=execution_provider)
 
-    multi_file = len(ipaths) > 1
-    if multi_file:
-        ipaths = tqdm.tqdm(ipaths, position=0, dynamic_ncols=True, desc="Batch progress")
 
     for ipath in ipaths:
         opath = base_opath
@@ -499,7 +488,6 @@ def main(argv: Sequence[str] | None = None, observer: Callable | None = None):
                 ellipse=ellipse,
                 draw_scores=draw_scores,
                 observer=observer,
-                nested=multi_file,
                 audio=audio,
                 ffmpeg_config=ffmpeg_config,
                 replaceimg=replaceimg,
@@ -535,4 +523,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(str(e))
         exit(1)
-

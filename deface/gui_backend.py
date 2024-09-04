@@ -38,7 +38,8 @@ class Backend(QObject):
 
                 task_id += 1
         except Exception as e:
-            self.error.emit(str(e))
+            import traceback
+            self.error.emit(str(e) + traceback.format_exc())
     def stop(self):
         self._running = False
 
