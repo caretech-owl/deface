@@ -30,6 +30,10 @@ python deface/cli.py
 
 ![Screenshot](img/deface_gui.png)
 
+## Demo
+
+https://github.com/user-attachments/assets/159894d8-c7d0-47e2-82d3-82c375e3a538
+
 ### Cli
 
 ```
